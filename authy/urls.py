@@ -2,24 +2,21 @@ from re import template
 from tokenize import Name
 from unicodedata import name
 from django.urls import path, include
-from authy.views import UserProfile, EditProfile
+from authy.views import UpdateProfileView, UserProfile, SignupRedirectView, PasswordChangeRedirectView
 from django_registration.backends.activation.views import RegistrationView
 from .forms import AuthyRegistrationForm
 from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
-   	
-    path('profile/edit', EditProfile, name='edit-profile'),
-	path('accounts/profile/', UserProfile, name='profile'),
-	path("accounts/signup/", RegistrationView.as_view(form_class=AuthyRegistrationForm), name="signup"),
-	path("accounts/", include("allauth.urls")),
+	path('accounts/signup/', SignupRedirectView.as_view(pattern_name='django_registration_register', permanent = False), name="signup"),
+    path('profile/edit/<str:pk>/', UpdateProfileView.as_view(template_name = 'edit_profile.html', success_url = '/accounts/profile/'), name='edit-profile'),
+	path('accounts/password_change/', PasswordChangeRedirectView.as_view(pattern_name='profile', permanent = False), name="password_change"),
+	path('accounts/profile/', UserProfile.as_view(template_name='settings.html'), name='profile'),
+	path("accounts/register/", RegistrationView.as_view(form_class=AuthyRegistrationForm), name="django_registration_register"),
+	path("accounts/", include("django_registration.backends.activation.urls")),
 	path('accounts/', include('django.contrib.auth.urls')),
-	
-
-	path("accounts/", include("django_registration.backends.activation.urls"))
-
-
-
+	path('accounts/password-reset/', auth_views.PasswordResetView.as_view(html_email_template_name='registration/html_password_reset_email.html'), name='password_reset'),
+	path("accounts/", include("allauth.urls")),
 
 ]

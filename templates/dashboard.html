@@ -1,0 +1,246 @@
+
+{% extends 'base.html' %} 
+{% load static %}
+<title>{% block title %}Dashboard{% endblock %}</title>
+{% block css %}<link rel="stylesheet"  href="{% static 'css/dashboard.css' %}" /> {% endblock %}
+
+
+{%block navbar%} {% endblock %}
+{% block content %}
+
+
+<header class="nav-aside">
+    <a href="{% url 'index' %}" class="metlab-logo">
+      <img src="{% static 'img/Horizontal_Logo.png' %}" alt="" />
+    </a>
+    <img src="{% static 'svg/Line_54.svg' %}" alt="">
+    <div class="dash">
+      <div class="dash-section">
+        <div class="light-gray">
+           <img src="{% static 'svg/menu.svg' %}" alt="">
+           <a href={% url 'dashboard' %}>Dashboard</P>
+        </div>
+      </div>
+      <div class="dash-section">
+           <div  class="light-gray">
+             <img src="{% static 'svg/profile.svg' %}" alt="">
+             <a href="{% url 'edit-profile' request.user.id %}">Profile</a>
+           </div>
+      </div>
+      <div class="dash-section">
+          <div class="light-gray">
+            <img src="{% static 'svg/save-2.svg' %}" alt="">
+            <a href="{% url 'save-page' %}">Saved Data</a>
+          </div>
+      </div>
+    </div>
+    <img src="{% static 'svg/Line_54.svg' %}" alt="">
+    <div class="dash">
+      <div class="dash-section">
+          <div  class="light-gray">
+            <img src="{% static 'svg/setting-2.svg' %}" alt="">
+            <a href="{% url 'edit-profile' request.user.id %}">Settings</a>
+          </div>
+      </div>
+      <div class="dash-section">
+         <div  class="light-gray">
+            <img src="{% static 'svg/24-support.svg' %}" alt="">
+            <a href="{% url 'contact' %}">Support</a>
+          </div>
+      </div>
+      <div class="dash-section">
+          <div  class="light-gray">
+            <img src="{% static 'svg/logout.svg' %}" alt="">
+            <a href="{% url 'logout' %}">Log Out</a>
+          </div>
+      </div>
+    </div>
+    <img src="{% static 'svg/Line 54.svg' %}" alt="">
+
+    <div class="rate-us">
+      <p>How would you rate us</p>
+      <div class="rates">
+          <img src="{% static 'img/Star_star.png' %}" class="star" alt="" />
+            
+          <img src="{% static 'img/Star_star.png' %}" class="star" alt="" />
+      
+          <img src="{% static 'img/Star_star.png' %}" class="star" alt="" />
+      
+          <img src="{% static 'img/Star_star.png' %}" class="star" alt="" />
+      
+          <img src="{% static 'img/Star_star.png' %}" class="star" alt="" />
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="section-container">
+    {% include 'top_menu.html' %}
+    <div class="main-flow-flex">
+      <section class="main-flow">
+          <div class="upload-container">
+            <form method="post" enctype="multipart/form-data" class="dropzone">
+                {% csrf_token %}
+                
+             <div class="upload-area">
+              <div class="icon"><img class="cloud-icon" src="{% static 'svg/cloud-plus.svg' %}" alt=""></div>
+              <p> Drag & drop to upload file or <button>Click to Upload</button></p>
+              
+              <input id="drag-area" type="file" hidden>
+              {{ form.file.errors }}
+            {{ form.file }}
+            </div>
+            
+
+            <div class="extraction-button">
+             <input class="extract-button" id="id_file" type="submit" value="Extract Metadata">           
+            </div>
+          </div>
+        </form>
+        {% if new_data %}
+        <div class="result-container">
+          <h3>Result</h3>
+         
+       
+         {% for key, value in new_data.exif.items %}
+         <div class="result-details">
+           <p>{{ value.desc }}:  <span>{{ value.val }}<span></p>
+         </div>
+         {% endfor %}
+  
+        
+         
+        <div class="result-buttons">
+         
+             <button class="share-button ">Share</button>
+             <div class="popup">
+                <section class="share-header">
+                  <span>Share File</span>
+                  <div class="close"><i class="uil uil-times"></i></div>
+                </section>
+ 
+                  <div class="content">
+                    <p>Copy link to share file</p>
+                    <div class="field">
+                      <i class="url-icon uil uil-link"></i>
+                      <input type="text" readonly value="" />
+                      <a class="shareLink" href="{% url 'share' new_data.id %}"><button class="copy-button"> Copy</button></a>
+                    </div>
+                  </div>
+                </div>
+              
+        
+            <a class="view-button" id="save-result"  href={{ new_data.get_absolute_url}}>Download</a>
+         
+        </div>
+        
+        {% endif %}
+     
+           
+         
+      </section>
+      <section class="right-side">
+        <h3>History</h3>
+        <div class="day"><p>Today</p> <img src="{% static 'svg/Line_54.svg' %}" alt=""></div>
+        {% for file in file_list %}
+        <a href="{{ file.get_absolute_url}}?q=view" rel="noopener" target="_blank">
+        <div class="history-data">
+         <div class="mtdata-img"><img src="{% static 'img/Vector.png' %}" alt=""></div>
+         <div class="mtdata">
+           <span>{{ file.file_name }}</span>
+           <p>107 kb</p>
+         </div>
+       </div>
+     </a>
+     {% endfor %}
+             
+        {% comment %} <div class="history-data">
+          <div class="mtdata-img"><img src="{% static 'img/Vector.png' %}" alt=""></div>
+   
+          <div class="mtdata">
+            <span>Nigerian Map.jpg</span>
+            <p>107 kb</p>
+          </div>
+        </div>
+        <div class="history-data">
+          <div class="mtdata-img1"><img src="{% static './Vector (1).png' %}" alt=""></div>
+          <div class="mtdata">
+            <span>Nigerian Map.csv</span>
+            <p>107 kb</p>
+          </div>
+        </div>
+        <div class="history-data">
+          <div class="mtdata-img2"><img src="{% static './Vector (2).png' %}" alt=""></div>
+          <div class="mtdata">
+            <span>Nigerian Map.mp3</span>
+            <p>107 kb</p>
+          </div>
+        </div>
+        <div class="history-data">
+          <div class="mtdata-img3"><img src="{% static './Vector (3).png' %}" alt=""></div>
+          <div class="mtdata">
+            <span>Nigerian Map.json</span>
+            <p>107 kb</p>
+          </div>
+        </div>
+        <div class="history-data">
+          <div class="mtdata-img4"><img src="{% static './Vector (4).png' %}" alt=""></div>
+          <div class="mtdata">
+            <span>Nigerian Map.pdf</span>
+            <p>107 kb</p>
+          </div>
+        </div> {% endcomment %}
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const shareLink = document.querySelectorAll(".shareLink")
+    const viewBtn = document.querySelector(".share-button"),
+    popup = document.querySelector(".popup"),
+    close = popup.querySelector(".close"),
+    field = popup.querySelector(".field"),
+    input = field.querySelector("input"),
+    copy = field.querySelector("button");
+   
+    
+    shareLink.forEach(share => {
+      share.addEventListener('click', function (event) {
+         event.preventDefault()
+         input.value = share.href
+       
+   
+      });
+    });
+ 
+    
+
+  viewBtn.onclick = () => {
+    popup.classList.toggle("show");
+    input.value = shareLink[0].href
+  };
+  close.onclick = () => {
+    viewBtn.click();
+  };
+
+  copy.onclick = () => {
+    input.select(); //select input value
+    if (document.execCommand("copy")) {
+      //if the selected text copy
+      field.classList.add("active");
+      copy.innerText = "Copied";
+      setTimeout(() => {
+        window.getSelection().removeAllRanges(); //remove selection from document
+        field.classList.remove("active");
+        copy.innerText = "Copy";
+      }, 3000);
+    }
+  };
+ </script>
+
+{% endblock %}
+{% block footer %}
+{% endblock %}
+{% block js %}
+<script type="text/javascript"  src="{% static 'js/dashboard.js' %}"></script>
+ 
+{% endblock %}

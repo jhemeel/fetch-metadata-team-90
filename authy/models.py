@@ -1,4 +1,5 @@
 from django.db import models
+from django.apps import apps
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.conf import settings
@@ -21,7 +22,7 @@ class MetlabUserManager(UserManager):
 			)
 		username = GlobalUserModel.normalize_username(username)
 		user = self.model(username=username, email=email, **extra_fields)
-		user.password = make_password(password)
+		user.set_password(password)
 		user.save(using=self._db)
 		return user
 	def create_user(self, username, email, password=None, **extra_fields):
@@ -35,7 +36,7 @@ class MetlabUserManager(UserManager):
 			raise ValueError("Superuser must have is_staff=True.")
 		if extra_fields.get("is_superuser") is not True:
 			raise ValueError("Superuser must have is_superuser=True.")
-			return self._create_user(username, email, password, **extra_fields)
+		return self._create_user(username, email, password, **extra_fields)
 
 class User(AbstractUser):
 
@@ -51,14 +52,14 @@ class User(AbstractUser):
 # do not touch
 
 class Profile(models.Model):
-	user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+	user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="profile", on_delete=models.CASCADE)
 	first_name = models.CharField(max_length=50, null=True, blank=True)
 	last_name = models.CharField(max_length=50, null=True, blank=True)
 	location = models.CharField(max_length=50, null=True, blank=True)
-	url = models.CharField(max_length=80, null=True, blank=True)
-	profile_info = models.TextField(max_length=150, null=True, blank=True)
+	url = models.URLField(max_length=80, null=True, blank=True)
+	profile_info = models.CharField(max_length=150, null=True, blank=True)
 	created = models.DateField(auto_now_add=True)
-	picture = models.ImageField(upload_to='profile_pictures', blank=True, null=True, verbose_name='Picture')
+	picture = models.ImageField(upload_to='profile', blank=True, null=True, verbose_name='Picture')
 
 def create_user_profile(sender, instance, created, **kwargs):
 	if created:
